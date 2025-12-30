@@ -15,8 +15,8 @@ module.exports = {
     * 
     *   - info.running(filepath): get the running status of a script at `filepath`. Example:
     * 
-    *     // check if install.json script is running
-    *     let installing = info.running("install.json")
+    *     // check if install.js script is running
+    *     let installing = info.running("install.js")
     *     if (installing) {
     *       ...
     *     }
@@ -31,13 +31,13 @@ module.exports = {
     * 
     *   - info.path(filepath): get the absolute path of a `fileapth`. Example:
     * 
-    *     // get the install.json absolute path
-    *     let absolute_path = info.path("install.json")
+    *     // get the install.js absolute path
+    *     let absolute_path = info.path("install.js")
     * 
     **********************************************************************************************/
-    let installed = info.exists("app/venv")
+    let installed = info.exists("app/trellis2")
     let running = {
-      install: info.running("install.json"),
+      install: info.running("install.js"),
       start: info.running("start.json"),
       update: info.running("update.js"),
       reset: info.running("reset.js"),
@@ -47,7 +47,7 @@ module.exports = {
         default: true,
         icon: "fa-solid fa-plug",
         text: "Installing",
-        href: "install.json",
+        href: "install.js",
       }]
     } else if (installed) {
       if (running.start) {
@@ -98,7 +98,7 @@ module.exports = {
         }, {
           icon: "fa-solid fa-plug",
           text: "Install",
-          href: "install.json",
+          href: "install.js",
         }, {
           icon: "fa-regular fa-circle-xmark",
           text: "<div><strong>Reset</strong><div>Revert to pre-install state</div></div>",
@@ -112,7 +112,7 @@ module.exports = {
         default: true,
         icon: "fa-solid fa-plug",
         text: "Install",
-        href: "install.json",
+        href: "install.js",
       }]
     }
   }
