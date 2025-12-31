@@ -22,11 +22,6 @@
   ],
   "posts": [],
   "plugin": {
-    "menu": [
-      {
-        "title": "Install",
-        "action": "install"
-      }
-    ]
+    "menu": []
   }
 }
