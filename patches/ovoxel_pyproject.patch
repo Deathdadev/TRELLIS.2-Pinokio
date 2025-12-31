@@ -2,8 +2,7 @@ diff --git a/pyproject.toml b/pyproject.toml
 index 1234567..abcdefg 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
-@@ -28,7 +28,7 @@ dependencies = [
-     "trimesh",
+@@ -29,6 +29,6 @@ dependencies = [
      "tqdm",
      "zstandard",
      "easydict",

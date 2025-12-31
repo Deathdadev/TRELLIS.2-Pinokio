@@ -83,7 +83,27 @@ module.exports = {
                 ]
             }
         },
-        // Step 6: Clone nvdiffrast (CUDA only)
+        // Step 6: Detect GPU architecture and set TORCH_CUDA_ARCH_LIST
+        {
+            when: "{{gpu === 'nvidia'}}",
+            method: "shell.run",
+            params: {
+                venv: "venv",
+                path: "app",
+                message: [
+                    "python -c \"import torch; cc = torch.cuda.get_device_capability(); print('CUDA_ARCH:' + str(cc[0]) + '.' + str(cc[1]))\""
+                ]
+            }
+        },
+        // Step 6b: Set the CUDA architecture environment variable
+        {
+            when: "{{gpu === 'nvidia'}}",
+            method: "local.set",
+            params: {
+                cuda_arch: "{{input.stdout.match(/CUDA_ARCH:(\\d+\\.\\d+)/)?.[1] || '8.9'}}"
+            }
+        },
+        // Step 7: Clone nvdiffrast (CUDA only)
         {
             when: "{{gpu === 'nvidia' && !exists('extensions/nvdiffrast')}}",
             method: "shell.run",
@@ -93,7 +113,7 @@ module.exports = {
                 ]
             }
         },
-        // Step 7: Install nvdiffrast
+        // Step 8: Install nvdiffrast
         {
             when: "{{gpu === 'nvidia'}}",
             method: "shell.run",
@@ -101,6 +121,9 @@ module.exports = {
                 venv: "venv",
                 path: "app",
                 build: true,
+                env: {
+                    TORCH_CUDA_ARCH_LIST: "{{local.cuda_arch}}"
+                },
                 message: [
                     "uv pip install ../extensions/nvdiffrast --no-build-isolation"
                 ]
@@ -124,6 +147,9 @@ module.exports = {
                 venv: "venv",
                 path: "app",
                 build: true,
+                env: {
+                    TORCH_CUDA_ARCH_LIST: "{{local.cuda_arch}}"
+                },
                 message: [
                     "uv pip install ../extensions/nvdiffrec --no-build-isolation"
                 ]
@@ -169,6 +195,9 @@ module.exports = {
                 venv: "venv",
                 path: "app",
                 build: true,
+                env: {
+                    TORCH_CUDA_ARCH_LIST: "{{local.cuda_arch}}"
+                },
                 message: [
                     "uv pip install ../extensions/CuMesh --no-build-isolation"
                 ]
@@ -192,6 +221,9 @@ module.exports = {
                 venv: "venv",
                 path: "app",
                 build: true,
+                env: {
+                    TORCH_CUDA_ARCH_LIST: "{{local.cuda_arch}}"
+                },
                 message: [
                     "uv pip install ../extensions/FlexGEMM --no-build-isolation"
                 ]
@@ -225,10 +257,10 @@ module.exports = {
             params: {
                 path: "extensions/o-voxel",
                 message: [
-                    "git apply --check ../../patches/ovoxel_pyproject.patch 2>/dev/null && git apply ../../patches/ovoxel_pyproject.patch || echo 'pyproject patch skipped'",
-                    "git apply --check ../../patches/ovoxel_pr59.patch 2>/dev/null && git apply ../../patches/ovoxel_pr59.patch || echo 'PR59 patch skipped'",
-                    "git apply --check ../../patches/ovoxel_pr60.patch 2>/dev/null && git apply ../../patches/ovoxel_pr60.patch || echo 'PR60 patch skipped'",
-                    "git apply --check ../../patches/ovoxel_pr61.patch 2>/dev/null && git apply ../../patches/ovoxel_pr61.patch || echo 'PR61 patch skipped'"
+                    "patch -p1 --forward < ../../patches/ovoxel_pyproject.patch || true",
+                    "patch -p1 --forward < ../../patches/ovoxel_pr59.patch || true",
+                    "patch -p1 --forward < ../../patches/ovoxel_pr60.patch || true",
+                    "patch -p1 --forward < ../../patches/ovoxel_pr61.patch || true"
                 ]
             }
         },
@@ -239,10 +271,10 @@ module.exports = {
             params: {
                 path: "extensions/o-voxel",
                 message: [
-                    "git apply --check ../../patches/ovoxel_pyproject.patch 2>NUL && git apply ../../patches/ovoxel_pyproject.patch && echo pyproject patch applied || echo pyproject patch skipped",
-                    "git apply --check ../../patches/ovoxel_pr59.patch 2>NUL && git apply ../../patches/ovoxel_pr59.patch && echo PR59 patch applied || echo PR59 patch skipped",
-                    "git apply --check ../../patches/ovoxel_pr60.patch 2>NUL && git apply ../../patches/ovoxel_pr60.patch && echo PR60 patch applied || echo PR60 patch skipped",
-                    "git apply --check ../../patches/ovoxel_pr61.patch 2>NUL && git apply ../../patches/ovoxel_pr61.patch && echo PR61 patch applied || echo PR61 patch skipped"
+                    "patch -p1 --forward < ../../patches/ovoxel_pyproject.patch || echo patch skipped",
+                    "patch -p1 --forward < ../../patches/ovoxel_pr59.patch || echo patch skipped",
+                    "patch -p1 --forward < ../../patches/ovoxel_pr60.patch || echo patch skipped",
+                    "patch -p1 --forward < ../../patches/ovoxel_pr61.patch || echo patch skipped"
                 ]
             }
         },
@@ -254,9 +286,119 @@ module.exports = {
                 venv: "venv",
                 path: "app",
                 build: true,
+                env: {
+                    TORCH_CUDA_ARCH_LIST: "{{local.cuda_arch}}"
+                },
                 message: [
                     "uv pip install ../extensions/o-voxel --no-build-isolation"
                 ]
+            }
+        },
+        // Step 18: Check HuggingFace authentication status
+        // Run hf auth whoami and capture the result - if it fails, user is not authenticated
+        // Using unique markers to avoid confusion with command echo
+        {
+            when: "{{platform !== 'win32'}}",
+            method: "shell.run",
+            params: {
+                venv: "venv",
+                path: "app",
+                message: [
+                    "hf auth whoami > /dev/null 2>&1 && echo 'HF_AUTH_YES' || echo 'HF_AUTH_NO'"
+                ]
+            }
+        },
+        {
+            when: "{{platform === 'win32'}}",
+            method: "shell.run",
+            params: {
+                venv: "venv",
+                path: "app",
+                message: [
+                    "hf auth whoami >NUL 2>&1 && echo HF_AUTH_YES || echo HF_AUTH_NO"
+                ]
+            }
+        },
+        // Step 19: Store auth status in local variable based on shell output
+        {
+            method: "local.set",
+            params: {
+                hf_authenticated: "{{input.stdout.includes('HF_AUTH_YES')}}"
+            }
+        },
+        // Step 20: Jump based on authentication status
+        {
+            method: "jump",
+            params: {
+                id: "{{local.hf_authenticated ? 'hf_auth_done' : 'download_mirrors'}}"
+            }
+        },
+        // Download models from mirrors (unauthenticated users)
+        {
+            id: "download_mirrors",
+            method: "log",
+            params: {
+                text: "*** Not authenticated with HuggingFace - downloading models from mirrors ***"
+            }
+        },
+        // Download DINOv3 from mirror (Linux/macOS)
+        {
+            when: "{{platform !== 'win32'}}",
+            method: "shell.run",
+            params: {
+                venv: "venv",
+                path: "app",
+                message: [
+                    "hf download camenduru/dinov3-vitl16-pretrain-lvd1689m",
+                    "cd {{env.HF_HOME}}/hub && mv models--camenduru--dinov3-vitl16-pretrain-lvd1689m models--facebook--dinov3-vitl16-pretrain-lvd1689m 2>/dev/null || true"
+                ]
+            }
+        },
+        // Download DINOv3 from mirror (Windows)
+        {
+            when: "{{platform === 'win32'}}",
+            method: "shell.run",
+            params: {
+                venv: "venv",
+                path: "app",
+                message: [
+                    "hf download camenduru/dinov3-vitl16-pretrain-lvd1689m",
+                    "cd /D {{env.HF_HOME}}\\hub && ren models--camenduru--dinov3-vitl16-pretrain-lvd1689m models--facebook--dinov3-vitl16-pretrain-lvd1689m"
+                ]
+            }
+        },
+        // Download RMBG-2.0 from mirror (Linux/macOS)
+        {
+            when: "{{platform !== 'win32'}}",
+            method: "shell.run",
+            params: {
+                venv: "venv",
+                path: "app",
+                message: [
+                    "hf download camenduru/RMBG-2.0",
+                    "cd {{env.HF_HOME}}/hub && mv models--camenduru--RMBG-2.0 models--briaai--RMBG-2.0 2>/dev/null || true"
+                ]
+            }
+        },
+        // Download RMBG-2.0 from mirror (Windows)
+        {
+            when: "{{platform === 'win32'}}",
+            method: "shell.run",
+            params: {
+                venv: "venv",
+                path: "app",
+                message: [
+                    "hf download camenduru/RMBG-2.0",
+                    "cd /D {{env.HF_HOME}}\\hub && ren models--camenduru--RMBG-2.0 models--briaai--RMBG-2.0"
+                ]
+            }
+        },
+        // Authenticated users skip to here
+        {
+            id: "hf_auth_done",
+            method: "log",
+            params: {
+                text: "*** HuggingFace authentication check complete ***"
             }
         },
         // Final step: Notify completion
