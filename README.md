@@ -38,6 +38,11 @@ Once installed, you can start the application directly from Pinokio:
 ## Credits
 
 - [Microsoft/TRELLIS.2](https://github.com/microsoft/TRELLIS.2) - The original TRELLIS project.
+- [Deathdadev/TRELLIS.2-Windows](https://github.com/Deathdadev/TRELLIS.2-Windows) - My forked version of the TRELLIS project with similar fixes to the pull requests below;
+- **Upstream Fixes referenced:**
+    - [PR #59: Fix MSVC build (remove GCC-only 'd' suffix)](https://github.com/microsoft/TRELLIS.2/pull/59)
+    - [PR #60: Fix MSVC narrowing conversion errors](https://github.com/microsoft/TRELLIS.2/pull/60)
+    - [PR #61: Fix GPU timeout on large meshes](https://github.com/microsoft/TRELLIS.2/pull/61)
 
 ## Citation
 
