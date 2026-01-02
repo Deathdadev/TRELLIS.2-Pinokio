@@ -4,7 +4,7 @@ module.exports = {
             method: "shell.run",
             params: {
                 message: [
-                    "git clone https://github.com/microsoft/TRELLIS.2.git app --recursive",
+                    "git clone https://github.com/6Morpheus6/TRELLIS.2 app --recursive",
                 ]
             }
         },
