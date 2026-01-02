@@ -44,7 +44,7 @@ module.exports = {
                 venv: "venv",
                 path: "app",
                 message: [
-                    "uv pip install wheel setuptools hf_xet imageio imageio-ffmpeg tqdm easydict opencv-python-headless ninja trimesh transformers gradio==6.0.1 tensorboard pandas lpips zstandard kornia timm plyfile numpy"
+                    "uv pip install wheel setuptools hf_xet imageio imageio-ffmpeg tqdm easydict opencv-python-headless ninja trimesh transformers gradio==5.50.0 tensorboard pandas lpips zstandard kornia timm plyfile numpy"
                 ]
             }
         },
@@ -162,7 +162,9 @@ module.exports = {
                 venv: "venv",
                 path: "app",
                 message: [
-                    "uv pip install https://github.com/Deathdadev/TRELLIS.2-Pinokio/releases/download/wheels/cumesh-0.0.1+cu128.torch270-cp310-cp310-win_amd64.whl https://github.com/Deathdadev/TRELLIS.2-Pinokio/releases/download/wheels/flex_gemm-0.0.1+cu128.torch270-cp310-cp310-win_amd64.whl https://github.com/Deathdadev/TRELLIS.2-Pinokio/releases/download/wheels/o_voxel-0.0.1+cu128.torch270-cp310-cp310-win_amd64.whl --no-build-isolation"
+                    "uv pip install ../wheels/cumesh-0.0.1-cp310-cp310-win_amd64.whl",
+                    "uv pip install ../wheels/flex_gemm-0.0.1-cp310-cp310-win_amd64.whl",
+                    "uv pip install ../wheels/o_voxel-0.0.1-cp310-cp310-win_amd64.whl"
                 ]
             }
         },
@@ -367,56 +369,57 @@ module.exports = {
         //         text: "*** Not authenticated with HuggingFace - downloading models from mirrors ***"
         //     }
         // },
-        // Download DINOv3 from mirror (Linux/macOS)
+        
+        // Download DINOv3 from mirror
+        {
+            method: "shell.run",
+            params: {
+                path: "app",
+                message: "hf download camenduru/dinov3-vitl16-pretrain-lvd1689m"
+            }
+        },
+        // Rename DINOv3 model directory  (Linux/macOS)
         {
             when: "{{platform !== 'win32'}}",
             method: "shell.run",
             params: {
-                venv: "venv",
-                path: "app",
-                message: [
-                    "hf download camenduru/dinov3-vitl16-pretrain-lvd1689m",
-                    "cd {{env.HF_HOME}}/hub && mv models--camenduru--dinov3-vitl16-pretrain-lvd1689m models--facebook--dinov3-vitl16-pretrain-lvd1689m 2>/dev/null || true"
-                ]
+                path: "./cache/HF_HOME/hub",
+                message: "mv models--camenduru--dinov3-vitl16-pretrain-lvd1689m models--facebook--dinov3-vitl16-pretrain-lvd1689m 2>/dev/null || true"
             }
         },
-        // Download DINOv3 from mirror (Windows)
+        // Rename DINOv3 model directory (Windows)
         {
             when: "{{platform === 'win32'}}",
             method: "shell.run",
             params: {
-                venv: "venv",
-                path: "app",
-                message: [
-                    "hf download camenduru/dinov3-vitl16-pretrain-lvd1689m",
-                    "cd /D {{env.HF_HOME}}\\hub && ren models--camenduru--dinov3-vitl16-pretrain-lvd1689m models--facebook--dinov3-vitl16-pretrain-lvd1689m"
-                ]
+                path: "./cache/HF_HOME/hub",
+                message: "ren models--camenduru--dinov3-vitl16-pretrain-lvd1689m models--facebook--dinov3-vitl16-pretrain-lvd1689m"
             }
         },
-        // Download RMBG-2.0 from mirror (Linux/macOS)
+        // Download RMBG-2.0 from mirror
+        {
+            method: "shell.run",
+            params: {
+                path: "app",
+                message: "hf download camenduru/RMBG-2.0"
+            }
+        },
+        // Rename RMBG-2.0  model directory (Linux)
         {
             when: "{{platform !== 'win32'}}",
             method: "shell.run",
             params: {
-                venv: "venv",
-                path: "app",
-                message: [
-                    "hf download camenduru/RMBG-2.0",
-                    "cd {{env.HF_HOME}}/hub && mv models--camenduru--RMBG-2.0 models--briaai--RMBG-2.0 2>/dev/null || true"
-                ]
+                path: "./cache/HF_HOME/hub",
+                message: "mv models--camenduru--RMBG-2.0 models--briaai--RMBG-2.0 2>/dev/null || true"
             }
         },
-        // Download RMBG-2.0 from mirror (Windows)
+        // Rename RMBG-2.0 model directory (Windows)
         {
             when: "{{platform === 'win32'}}",
             method: "shell.run",
             params: {
-                venv: "venv",
-                path: "app",
-                message: [
-                    "hf download camenduru/RMBG-2.0",
-                    "cd /D {{env.HF_HOME}}\\hub && ren models--camenduru--RMBG-2.0 models--briaai--RMBG-2.0"
-                ]
+                path: "./cache/HF_HOME/hub",
+                message: "ren models--camenduru--RMBG-2.0 models--briaai--RMBG-2.0"
             }
         },
         // // Authenticated users skip to here
