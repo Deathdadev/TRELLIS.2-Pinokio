@@ -106,6 +106,18 @@ module.exports = {
                 cuda_arch: "{{input.stdout.match(/CUDA_ARCH:(\\d+\\.\\d+)/)?.[1] || '8.9'}}"
             }
         },
+        // Step 6c: Upgrade Triton to 3.6.0 for Blackwell GPU support (Linux + sm_120 only)
+        {
+            when: "{{platform === 'linux' && local.cuda_arch.startsWith('12')}}",
+            method: "shell.run",
+            params: {
+                venv: "venv",
+                path: "app",
+                message: [
+                    "uv pip install triton==3.6.0"
+                ]
+            }
+        },
         // Step 7: Clone nvdiffrast (CUDA only)
         {
             when: "{{gpu === 'nvidia' && !exists('extensions/nvdiffrast')}}",
