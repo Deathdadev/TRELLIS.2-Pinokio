@@ -47,7 +47,7 @@ module.exports = {
                 venv: "venv",
                 path: "app",
                 message: [
-                    "uv pip install wheel setuptools imageio imageio-ffmpeg tqdm easydict opencv-python-headless ninja trimesh transformers gradio==5.50.0 tensorboard pandas lpips zstandard kornia timm plyfile numpy"
+                    "uv pip install wheel setuptools imageio imageio-ffmpeg tqdm easydict opencv-python-headless ninja trimesh transformers gradio==5.50.0 tensorboard pandas lpips zstandard kornia timm plyfile numpy spconv-cu124"
                 ]
             }
         },
@@ -74,15 +74,15 @@ module.exports = {
                 ]
             }
         },
-        // Step 5b: Install pillow-simd (Linux - Custom Wheel)
+        // Step 5b: Install Pillow from source (Linux - for glibc compatibility)
         {
-            when: "{{platform === 'linux'}}", // explicitly linux, not generic !darwin just in case
+            when: "{{platform === 'linux'}}",
             method: "shell.run",
             params: {
                 venv: "venv",
                 path: "app",
                 message: [
-                    "uv pip install https://github.com/Deathdadev/pillow-simd/releases/download/v9.5.0.post2/pillow_simd-9.5.0.post2-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+                    "uv pip install --no-binary pillow pillow"
                 ]
             }
         },
