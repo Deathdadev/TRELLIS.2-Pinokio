@@ -47,7 +47,7 @@ module.exports = {
                 venv: "venv",
                 path: "app",
                 message: [
-                    "uv pip install wheel setuptools imageio imageio-ffmpeg tqdm easydict opencv-python-headless ninja trimesh transformers gradio==5.50.0 tensorboard pandas lpips zstandard kornia timm plyfile numpy spconv-cu124"
+                    "uv pip install wheel setuptools imageio imageio-ffmpeg tqdm easydict opencv-python-headless ninja trimesh transformers gradio==5.50.0 tensorboard pandas lpips zstandard kornia timm plyfile numpy spconv-cu124 pygltflib"
                 ]
             }
         },
