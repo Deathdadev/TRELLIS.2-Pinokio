@@ -106,18 +106,6 @@ module.exports = {
                 cuda_arch: "{{input.stdout.match(/CUDA_ARCH:(\\d+\\.\\d+)/)?.[1] || '8.9'}}"
             }
         },
-        // Step 6c: Upgrade Triton to 3.6.0+ for Blackwell and newer GPUs (Linux + sm_120+ only)
-        {
-            when: "{{platform === 'linux' && Number(local.cuda_arch.split('.')[0]) >= 12}}",
-            method: "shell.run",
-            params: {
-                venv: "venv",
-                path: "app",
-                message: [
-                    "uv pip install 'triton>=3.6.0'"
-                ]
-            }
-        },
         // Step 7: Clone nvdiffrast (CUDA only)
         {
             when: "{{gpu === 'nvidia' && !exists('extensions/nvdiffrast')}}",
@@ -445,6 +433,19 @@ module.exports = {
         //         text: "*** HuggingFace authentication check complete ***"
         //     }
         // },
+        // Upgrade Triton to 3.6.0+ for Blackwell and newer GPUs (Linux + sm_120+ only)
+        // This must be done at the end because other packages may downgrade Triton
+        {
+            when: "{{platform === 'linux' && Number(local.cuda_arch.split('.')[0]) >= 12}}",
+            method: "shell.run",
+            params: {
+                venv: "venv",
+                path: "app",
+                message: [
+                    "uv pip install 'triton>=3.6.0'"
+                ]
+            }
+        },
         // Final step: Notify completion
         {
             method: "log",
