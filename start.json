@@ -10,7 +10,9 @@
         "path": "app",
         "venv": "venv",
         "chain": true,
-        "env": {},
+        "env": {
+          "SPARSE_CONV_BACKEND": "flex_gemm"
+        },
         "input": null,
         "message": [
           "python app.py"
