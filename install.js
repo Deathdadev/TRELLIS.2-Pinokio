@@ -47,7 +47,7 @@ module.exports = {
                 venv: "venv",
                 path: "app",
                 message: [
-                    "uv pip install wheel setuptools imageio imageio-ffmpeg tqdm easydict opencv-python-headless ninja trimesh transformers gradio==5.50.0 tensorboard pandas lpips zstandard kornia timm plyfile numpy spconv-cu124 pygltflib"
+                    "uv pip install wheel setuptools imageio imageio-ffmpeg tqdm easydict opencv-python-headless ninja trimesh transformers gradio==5.50.0 tensorboard pandas lpips zstandard kornia timm plyfile numpy pygltflib"
                 ]
             }
         },
@@ -433,7 +433,7 @@ module.exports = {
         //         text: "*** HuggingFace authentication check complete ***"
         //     }
         // },
-        // Upgrade Triton to 3.6.0+ for Blackwell and newer GPUs (Linux + sm_120+ only)
+        // Upgrade Triton and spconv to for Blackwell and newer GPUs (Linux + sm_120+ only)
         // This must be done at the end because other packages may downgrade Triton
         {
             when: "{{platform === 'linux' && Number(local.cuda_arch.split('.')[0]) >= 12}}",
@@ -442,7 +442,7 @@ module.exports = {
                 venv: "venv",
                 path: "app",
                 message: [
-                    "uv pip install 'triton>=3.6.0'"
+                    "uv pip install 'triton>=3.6.0' spconv-cu126"
                 ]
             }
         },
