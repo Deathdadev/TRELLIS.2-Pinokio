@@ -47,7 +47,7 @@ module.exports = {
                 venv: "venv",
                 path: "app",
                 message: [
-                    "uv pip install wheel setuptools imageio imageio-ffmpeg tqdm easydict opencv-python-headless ninja trimesh transformers gradio==5.50.0 tensorboard pandas lpips zstandard kornia timm plyfile numpy"
+                    "uv pip install wheel setuptools imageio imageio-ffmpeg tqdm easydict opencv-python-headless ninja trimesh transformers==4.57.3 gradio==5.50.0 tensorboard pandas lpips zstandard kornia timm plyfile numpy pygltflib"
                 ]
             }
         },
@@ -74,15 +74,15 @@ module.exports = {
                 ]
             }
         },
-        // Step 5b: Install pillow-simd (Linux - Custom Wheel)
+        // Step 5b: Install Pillow from source (Linux - for glibc compatibility)
         {
-            when: "{{platform === 'linux'}}", // explicitly linux, not generic !darwin just in case
+            when: "{{platform === 'linux'}}",
             method: "shell.run",
             params: {
                 venv: "venv",
                 path: "app",
                 message: [
-                    "uv pip install https://github.com/Deathdadev/pillow-simd/releases/download/v9.5.0.post2/pillow_simd-9.5.0.post2-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+                    "uv pip install --no-binary pillow-simd pillow-simd"
                 ]
             }
         },
@@ -325,7 +325,32 @@ module.exports = {
                 ]
             }
         },
-        // // Step 18: Check HuggingFace authentication status
+        // Step 18a: Upgrade Triton and spconv for Blackwell and newer GPUs (Linux + sm_120+ only)
+        // This must be done at the end because other packages may downgrade Triton
+        {
+            when: "{{platform === 'linux' && Number(local.cuda_arch.split('.')[0]) >= 12}}",
+            method: "shell.run",
+            params: {
+                venv: "venv",
+                path: "app",
+                message: [
+                    "uv pip install 'triton>=3.6.0' spconv-cu126"
+                ]
+            }
+        },
+        // Step 18b: Prevent transformers upgrade.
+        // This must be done at the end because other packages may upgrade transformers.
+        {
+            method: "shell.run",
+            params: {
+                venv: "venv",
+                path: "app",
+                message: [
+                    "uv pip install transformers==4.57.3"
+                ]
+            }
+        },
+        // // Step 19: Check HuggingFace authentication status
         // // Run hf auth whoami and capture the result - if it fails, user is not authenticated
         // // Using unique markers to avoid confusion with command echo
         // {
@@ -350,14 +375,14 @@ module.exports = {
         //         ]
         //     }
         // },
-        // // Step 19: Store auth status in local variable based on shell output
+        // // Step 20: Store auth status in local variable based on shell output
         // {
         //     method: "local.set",
         //     params: {
         //         hf_authenticated: "{{input.stdout.includes('HF_AUTH_YES')}}"
         //     }
         // },
-        // // Step 20: Jump based on authentication status
+        // // Step 21: Jump based on authentication status
         // {
         //     method: "jump",
         //     params: {
