@@ -339,7 +339,7 @@ module.exports = {
             }
         },
         // Step 18b: Prevent transformers upgrade.
-        // This must be done at the end because other packages may downgrade transformers.
+        // This must be done at the end because other packages may upgrade transformers.
         {
             method: "shell.run",
             params: {
