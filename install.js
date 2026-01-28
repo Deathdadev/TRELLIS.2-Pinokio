@@ -433,7 +433,7 @@ module.exports = {
         //         text: "*** HuggingFace authentication check complete ***"
         //     }
         // },
-        // Upgrade Triton and spconv to for Blackwell and newer GPUs (Linux + sm_120+ only)
+        // Upgrade Triton and spconv for Blackwell and newer GPUs (Linux + sm_120+ only)
         // This must be done at the end because other packages may downgrade Triton
         {
             when: "{{platform === 'linux' && Number(local.cuda_arch.split('.')[0]) >= 12}}",
