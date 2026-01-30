@@ -47,7 +47,7 @@ module.exports = {
                 venv: "venv",
                 path: "app",
                 message: [
-                    "uv pip install wheel setuptools imageio imageio-ffmpeg tqdm easydict opencv-python-headless ninja trimesh transformers==4.57.3 gradio==5.50.0 tensorboard pandas lpips zstandard kornia timm plyfile numpy pygltflib"
+                    "uv pip install wheel setuptools imageio imageio-ffmpeg tqdm easydict opencv-python-headless ninja trimesh transformers==4.57.3 gradio==5.50.0 tensorboard pandas lpips zstandard kornia timm plyfile numpy pygltflib pymeshlab"
                 ]
             }
         },
@@ -336,6 +336,16 @@ module.exports = {
                 message: [
                     "uv pip install 'triton>=3.6.0' spconv-cu126"
                 ]
+            }
+        },
+        // Step 18a-2: Update start.json to use spconv backend for Blackwell GPUs
+        {
+            when: "{{platform === 'linux' && Number(local.cuda_arch.split('.')[0]) >= 12}}",
+            method: "json.set",
+            params: {
+                "start.json": {
+                    "run.0.params.env.SPARSE_CONV_BACKEND": "spconv"
+                }
             }
         },
         // Step 18b: Prevent transformers upgrade.
