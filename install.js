@@ -166,7 +166,7 @@ module.exports = {
                 path: "app",
                 message: [
                     "uv pip install ../wheels/cumesh-0.0.1-cp310-cp310-win_amd64.whl",
-                    "uv pip install ../wheels/flex_gemm-0.0.1-cp310-cp310-win_amd64.whl",
+                    "uv pip install ../wheels/flex_gemm-1.0.0-cp310-cp310-win_amd64.whl",
                     "uv pip install ../wheels/o_voxel-0.0.1-cp310-cp310-win_amd64.whl --no-build-isolation --no-deps"
                 ]
             }
