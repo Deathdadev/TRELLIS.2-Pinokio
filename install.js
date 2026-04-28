@@ -407,9 +407,10 @@ module.exports = {
         //         text: "*** Not authenticated with HuggingFace - downloading models from mirrors ***"
         //     }
         // },
-        
+
         // Download DINOv3 from mirror
         {
+            when: "{{!exists('cache/HF_HOME/hub/models--facebook--dinov3-vitl16-pretrain-lvd1689m')}}",
             method: "shell.run",
             params: {
                 path: "app",
@@ -418,7 +419,7 @@ module.exports = {
         },
         // Rename DINOv3 model directory  (Linux/macOS)
         {
-            when: "{{platform !== 'win32'}}",
+            when: "{{platform !== 'win32' && !exists('cache/HF_HOME/hub/models--facebook--dinov3-vitl16-pretrain-lvd1689m')}}",
             method: "shell.run",
             params: {
                 path: "./cache/HF_HOME/hub",
@@ -427,7 +428,7 @@ module.exports = {
         },
         // Rename DINOv3 model directory (Windows)
         {
-            when: "{{platform === 'win32'}}",
+            when: "{{platform === 'win32' && !exists('cache/HF_HOME/hub/models--facebook--dinov3-vitl16-pretrain-lvd1689m')}}",
             method: "shell.run",
             params: {
                 path: "./cache/HF_HOME/hub",
@@ -436,6 +437,7 @@ module.exports = {
         },
         // Download RMBG-2.0 from mirror
         {
+            when: "{{!exists('cache/HF_HOME/hub/models--briaai--RMBG-2.0')}}",
             method: "shell.run",
             params: {
                 path: "app",
@@ -444,7 +446,7 @@ module.exports = {
         },
         // Rename RMBG-2.0  model directory (Linux)
         {
-            when: "{{platform !== 'win32'}}",
+            when: "{{platform !== 'win32' && !exists('cache/HF_HOME/hub/models--briaai--RMBG-2.0')}}",
             method: "shell.run",
             params: {
                 path: "./cache/HF_HOME/hub",
@@ -453,7 +455,7 @@ module.exports = {
         },
         // Rename RMBG-2.0 model directory (Windows)
         {
-            when: "{{platform === 'win32'}}",
+            when: "{{platform === 'win32' && !exists('cache/HF_HOME/hub/models--briaai--RMBG-2.0')}}",
             method: "shell.run",
             params: {
                 path: "./cache/HF_HOME/hub",
