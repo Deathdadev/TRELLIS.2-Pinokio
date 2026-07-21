@@ -1,7 +1,7 @@
 module.exports = {
   version: "5.0",
   menu: async (kernel, info) => {
-    let installed = info.exists("app/trellis2")
+    let installed = info.exists("app/venv")
     let running = {
       install: info.running("install.js"),
       start: info.running("start.json"),
